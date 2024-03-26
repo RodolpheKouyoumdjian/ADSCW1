@@ -11,10 +11,10 @@ public class AliasMap {
     }
 
     public static void addAlias(String alias, String actualName) {
-        aliasMap.put(alias.toLowerCase(), actualName.toLowerCase());
+        aliasMap.put(alias, actualName);
     }
 
     public static String resolveAlias(String name) {
-        return aliasMap.getOrDefault(name.toLowerCase(), name.toLowerCase());
+        return aliasMap.getOrDefault(name, name);
     }
 }

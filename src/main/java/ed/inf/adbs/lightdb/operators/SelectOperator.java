@@ -33,11 +33,11 @@ public class SelectOperator extends Operator {
         // Extract table names from FROM clause
         Set<String> fromTables = new HashSet<>();
         FromItem fromItem = select.getPlainSelect().getFromItem();
-        fromTables.add(AliasMap.resolveAlias(fromItem.getAlias().getName().toLowerCase()));
+        fromTables.add(AliasMap.resolveAlias(fromItem.getAlias().getName()));
 
         if (select.getPlainSelect().getJoins() != null) {
             for (Join join : select.getPlainSelect().getJoins()) {
-                fromTables.add(AliasMap.resolveAlias(join.getRightItem().getAlias().getName().toLowerCase()));
+                fromTables.add(AliasMap.resolveAlias(join.getRightItem().getAlias().getName()));
             }
         }
 

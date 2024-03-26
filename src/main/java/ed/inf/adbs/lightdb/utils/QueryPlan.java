@@ -3,11 +3,18 @@ package ed.inf.adbs.lightdb.utils;
 import java.util.List;
 
 import ed.inf.adbs.lightdb.DatabaseCatalog;
+import ed.inf.adbs.lightdb.operators.DuplicateEliminationOperator;
 import ed.inf.adbs.lightdb.operators.JoinOperator;
 import ed.inf.adbs.lightdb.operators.Operator;
 import ed.inf.adbs.lightdb.operators.ProjectOperator;
 import ed.inf.adbs.lightdb.operators.ScanOperator;
 import ed.inf.adbs.lightdb.operators.SelectOperator;
+import ed.inf.adbs.lightdb.operators.SortOperator;
+import ed.inf.adbs.lightdb.operators.SumOperator;
+import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.AllColumns;
@@ -15,6 +22,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectItem;
 
 public class QueryPlan {
     private Operator rootOperator;
@@ -26,22 +34,24 @@ public class QueryPlan {
 
         // Extract the table name from the FROM clause
         FromItem fromItem = plainSelect.getFromItem();
-        String fromItemTableName = fromItem.toString().toLowerCase().split(" ")[0];
+        String fromItemTableName = fromItem.toString().split(" ")[0];
 
         // Add the table to the DatabaseCatalog
         DatabaseCatalog.getInstance().addTable(fromItemTableName);
 
         // Populate aliasMap from FROM clause
         if (fromItem.getAlias() != null) {
-            String fromItemAlias = fromItem.getAlias().getName().toLowerCase();
+            String fromItemAlias = fromItem.getAlias().getName();
             AliasMap.addAlias(fromItemAlias, fromItemTableName);
         }
 
         if (joins != null) {
             for (Join join : joins) {
-                if (join.getRightItem().getAlias() != null) {
-                    String joinItemActualName = join.getRightItem().toString().toLowerCase().split(" ")[0];
-                    String joinItemAlias = join.getRightItem().getAlias().getName().toLowerCase();
+                FromItem joinFromItem = join.getFromItem();
+                Alias joinAlias = joinFromItem.getAlias();
+                if (joinAlias != null) {
+                    String joinItemActualName = joinFromItem.toString().split(" ")[0];
+                    String joinItemAlias = joinAlias.getName();
                     AliasMap.addAlias(joinItemAlias, joinItemActualName);
                 }
             }
@@ -53,12 +63,10 @@ public class QueryPlan {
         this.rootOperator = scanOperator;
 
         // If there are joins, create JoinOperators
-
         if (joins != null) {
             for (Join join : joins) {
-                String joinTableName = join.getRightItem().toString().toLowerCase().split(" ")[0];
+                String joinTableName = join.getRightItem().toString().split(" ")[0];
                 DatabaseCatalog.getInstance().addTable(joinTableName);
-
                 t = new Table(joinTableName).withAlias(join.getRightItem().getAlias());
                 rootOperator = new JoinOperator(rootOperator, new ScanOperator(t),
                         select.getPlainSelect().getWhere());
@@ -70,10 +78,43 @@ public class QueryPlan {
             }
         }
 
+        // If GROUP BY clause exists, create a GroupByOperator
+        // Print in pink if group by is null
         // If not all columns are selected, create a ProjectOperator
-        if (!(plainSelect.getSelectItems().get(0).getExpression() instanceof AllColumns)) {
-            this.rootOperator = new ProjectOperator(this.rootOperator, select);
+
+        List<SelectItem<?>> firstSelectItemExpression = plainSelect.getSelectItems();
+        boolean containsSumAggregate = false;
+        for (SelectItem<?> selectItem : firstSelectItemExpression) {
+            Expression exp = selectItem.getExpression();
+            if (exp instanceof Function) {
+                if (((Function) exp).getName().equals("SUM")) {
+                    containsSumAggregate = true;
+                    break;
+                }
+            }
         }
+        if (!(firstSelectItemExpression instanceof AllColumns)) {
+            if ((containsSumAggregate)
+                    || plainSelect.getGroupBy() != null) {
+                this.rootOperator = new SumOperator(
+                    this.rootOperator, 
+                    plainSelect
+                );
+            } else {
+                this.rootOperator = new ProjectOperator(this.rootOperator, select);
+            }
+        }
+
+        // If DISTINCT keyword exists, create a DuplicateEliminationOperator
+        if (plainSelect.getDistinct() != null) {
+            this.rootOperator = new DuplicateEliminationOperator(this.rootOperator);
+        }
+
+        // If ORDER BY clause exists, create a SortOperator
+        if (plainSelect.getOrderByElements() != null) {
+            this.rootOperator = new SortOperator(this.rootOperator, select);
+        }
+
     }
 
     public Operator getRootOperator() {

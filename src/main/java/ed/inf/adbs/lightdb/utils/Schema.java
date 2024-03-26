@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class Schema {
     private static Schema instance; // Singleton instance
-    private Map<String, List<Column>> tables = new HashMap<>();
+    private static Map<String, List<Column>> tables = new HashMap<>();
 
     /**
      * Private constructor to load the schema from a file.
@@ -32,11 +32,10 @@ public class Schema {
 
             for (String line : lines) {
                 String[] parts = line.split(" ");
-                // To lowercase since SQL is case insensitive
-                String tableName = parts[0].toLowerCase();
+                String tableName = parts[0];
                 List<Column> columns = new ArrayList<>();
                 for (int i = 1; i < parts.length; i++) {
-                    columns.add(new Column(new Table(null, tableName), parts[i].toLowerCase()));
+                    columns.add(new Column(new Table(null, tableName), parts[i]));
                 }
 
                 tables.put(tableName, columns);
@@ -52,13 +51,13 @@ public class Schema {
      * @param schemaFile Path to the schema file
      * @return The initialized singleton instance
      */
-    public static Schema init(String databaseDir) {
+    public static Map<String, List<Column>> init(String databaseDir) {
         if (instance != null) {
             throw new IllegalStateException(
                     "Schema has already been initialized. init(String schemaFile) should only be called once.");
         }
         instance = new Schema(databaseDir + File.separator + "schema.txt");
-        return instance;
+        return tables;
     }
 
     public static void destroy() {
@@ -84,14 +83,25 @@ public class Schema {
      * @return List of column names
      */
     public List<Column> getColumns(Table table) {
-        // To lowercase since SQL is case insensitive
-        List<Column> columns = tables.get(table.getName().toLowerCase());
+        String tableName = table.getName();
+        List<Column> originalColumns = tables.get(tableName);
 
-        // Add the table attribute to the columns
-        for (int i = 0; i < columns.size(); i++) {
-            columns.get(i).setTable(table);;
+        // Create a new list to hold deep copies of the columns
+        List<Column> copiedColumns = new ArrayList<>(originalColumns.size());
+
+        // Populate the new list with deep copies of the columns
+        for (Column column : originalColumns) {
+            // Create a deep copy of the column
+            Column copiedColumn = new Column(column.getTable(), column.getColumnName());
+            copiedColumns.add(copiedColumn);
         }
-        return tables.get(table.getName().toLowerCase());
+
+        // Add the table attribute to the copied columns
+        for (Column copiedColumn : copiedColumns) {
+            copiedColumn.setTable(table);
+        }
+
+        return copiedColumns;
     }
 
     /**
@@ -110,8 +120,7 @@ public class Schema {
      *                              "Collection.html#optional-restrictions">optional</a>)
      */
     public int getColumnIndex(Column column) {
-        // To lowercase since SQL is case insensitive
-        String tableName = AliasMap.resolveAlias(column.getTable().getName().toLowerCase());
+        String tableName = AliasMap.resolveAlias(column.getTable().getName());
         if (!tables.containsKey(tableName)) {
             throw new RuntimeException("Table " + column.getTable().getName() + " does not exist in the schema");
         }
@@ -121,7 +130,8 @@ public class Schema {
         for (int i = 0; i < columns.size(); i++) {
             Column col = columns.get(i);
 
-            if (ColumnEquals.equals(col, column)) {
+
+            if (ColumnEquals.equals(col, column, false)) {
                 return i;
             }
         }

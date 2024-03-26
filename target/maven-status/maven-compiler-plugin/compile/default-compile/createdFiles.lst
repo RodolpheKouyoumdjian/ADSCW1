@@ -1,6 +1,9 @@
+ed/inf/adbs/lightdb/operators/SortOperator$1.class
 ed/inf/adbs/lightdb/operators/ScanOperator.class
 ed/inf/adbs/lightdb/utils/AliasMap.class
 ed/inf/adbs/lightdb/utils/Tuple.class
+ed/inf/adbs/lightdb/operators/SumOperator.class
+ed/inf/adbs/lightdb/operators/SortOperator.class
 ed/inf/adbs/lightdb/operators/Operator.class
 ed/inf/adbs/lightdb/DatabaseCatalog.class
 ed/inf/adbs/lightdb/operators/ProjectOperator.class
@@ -11,4 +14,5 @@ ed/inf/adbs/lightdb/utils/Schema.class
 ed/inf/adbs/lightdb/utils/TableNameExtractor.class
 ed/inf/adbs/lightdb/utils/QueryPlan.class
 ed/inf/adbs/lightdb/utils/ColumnEquals.class
+ed/inf/adbs/lightdb/operators/DuplicateEliminationOperator.class
 ed/inf/adbs/lightdb/LightDB.class

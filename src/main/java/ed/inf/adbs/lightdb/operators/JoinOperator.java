@@ -13,11 +13,11 @@ public class JoinOperator extends Operator {
     private Expression where;
 
     public JoinOperator(Operator leftOperator, Operator rightOperator, Expression where) {
+        leftOperator.reset();
+        rightOperator.reset();
         this.leftOperator = leftOperator;
         this.rightOperator = rightOperator;
         this.where = where;
-        leftOperator.reset(); // Reset the left operator to ensure it starts from the beginning
-        rightOperator.reset(); // Reset the right operator to ensure it starts from the beginning
     }
 
     private List<Tuple> matchedTuples = new ArrayList<>();
@@ -42,7 +42,6 @@ public class JoinOperator extends Operator {
             while ((rightTuple = rightOperator.getNextTuple()) != null) {
                 // Evaluate the join condition
                 Tuple mergedTuple = currentLeftTuple.join(rightTuple);
-                System.out.println(mergedTuple);
                 ExpressionEvaluator evaluator = new ExpressionEvaluator(mergedTuple);
                 boolean result = evaluator.evaluate(this.where);
                 if (result) {

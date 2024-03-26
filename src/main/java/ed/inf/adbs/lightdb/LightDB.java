@@ -42,6 +42,7 @@ public class LightDB {
 			// Statement statement = CCJSqlParserUtil.parse("SELECT * FROM Boats");
 			if (statement != null) {
 				// Init DatabaseCatalog & Schema
+
 				Schema.init(databaseDir);
 				DatabaseCatalog.init(databaseDir);
 

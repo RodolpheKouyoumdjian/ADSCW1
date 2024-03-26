@@ -1,6 +1,7 @@
 package ed.inf.adbs.lightdb.utils;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jsqlparser.schema.Column;
 
@@ -8,53 +9,26 @@ import net.sf.jsqlparser.schema.Column;
  * Represents a tuple in a database table.
  */
 public class Tuple {
-    private String[] values;
+    private List<String> values;
 
     // Column names of the table the tuple is a member of. If it is a merge of
     // multiple tables it'll be the merge of the column names
-    private Column[] columns;
+    private List<Column> columns;
 
     /**
      * Constructs a tuple with the given values.
      *
      * @param values the values of the tuple
      */
-    public Tuple(String[] values, Column[] columns) {
+    public Tuple(List<String> values, List<Column> columns) {
         this.values = values;
         this.columns = columns;
     }
 
-    /**
-     * Computes the hash code for the tuple.
-     *
-     * @return the hash code value for the tuple
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(values);
-        return result;
-    }
-
-    /**
-     * Checks if the given object is equal to this tuple.
-     *
-     * @param obj the object to compare with
-     * @return true if the given object is equal to this tuple, false otherwise
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Tuple other = (Tuple) obj;
-        if (!Arrays.equals(values, other.values))
-            return false;
-        return true;
+    // Constructs tuple given single value
+    public Tuple(String value) {
+        this.values = new ArrayList<>();
+        this.values.add(value);
     }
 
     /**
@@ -65,15 +39,13 @@ public class Tuple {
      */
     public Tuple join(Tuple tuple) {
         if (tuple == null) {
-            return this;
+            return new Tuple(new ArrayList<>(this.values), new ArrayList<>(this.columns));
         }
-        String[] newValues = new String[values.length + tuple.values.length];
-        System.arraycopy(values, 0, newValues, 0, values.length);
-        System.arraycopy(tuple.values, 0, newValues, values.length, tuple.values.length);
+        List<String> newValues = new ArrayList<>(this.values);
+        newValues.addAll(tuple.values);
 
-        Column[] newColumns = new Column[columns.length + tuple.columns.length];
-        System.arraycopy(columns, 0, newColumns, 0, columns.length);
-        System.arraycopy(tuple.columns, 0, newColumns, columns.length, tuple.columns.length);
+        List<Column> newColumns = new ArrayList<>(this.columns);
+        newColumns.addAll(tuple.columns);
 
         return new Tuple(newValues, newColumns);
     }
@@ -83,8 +55,8 @@ public class Tuple {
      *
      * @return the values of the tuple
      */
-    public String[] getValues() {
-        return values;
+    public List<String> getValues() {
+        return new ArrayList<>(values);
     }
 
     /**
@@ -104,7 +76,7 @@ public class Tuple {
      * @return the value at the specified index
      */
     public String get(int index) {
-        return values[index];
+        return values.get(index);
     }
 
     /**
@@ -113,26 +85,63 @@ public class Tuple {
      * @return the number of values in the tuple
      */
     public int size() {
-        return values.length;
+        return values.size();
     }
 
-    public Column[] getColumns() {
-        return columns;
+    public List<Column> getColumns() {
+        return new ArrayList<>(columns);
     }
 
     public Column getColumn(int index) {
-        return columns[index];
+        return columns.get(index);
     }
 
-    public String getValueFromColumn(Column column) {
-        for (int i = 0; i < columns.length; i++) {
-            Column col = columns[i];
+    public Long getValueFromColumn(Column column) {
 
-            if (ColumnEquals.equals(col, column)) {
-                return values[i];
+        for (int i = 0; i < columns.size(); i++) {
+            Column col = columns.get(i);
+
+            if (ColumnEquals.equals(col, column, true)) {
+                return Long.parseLong(values.get(i));
             }
-            System.out.println(col + " != " + column);
         }
         throw new RuntimeException();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((values == null) ? 0 : values.hashCode());
+        result = prime * result + ((columns == null) ? 0 : columns.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Tuple other = (Tuple) obj;
+
+        if (values == null) {
+            if (other.values != null)
+                return false;
+        } else if (!values.equals(other.values))
+            return false;
+        if (columns == null) {
+            if (other.columns != null)
+                return false;
+        } else if (!columns.equals(other.columns)) {
+            for (Column column : columns) {
+                if (!ColumnEquals.equals(column, column, true)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

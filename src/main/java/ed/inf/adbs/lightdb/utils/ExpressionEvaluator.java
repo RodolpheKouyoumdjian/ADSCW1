@@ -31,7 +31,6 @@ public class ExpressionEvaluator extends ExpressionDeParser {
      *                                       supported.
      */
     public Boolean evaluate(Expression expression) {
-        System.out.println("EXPRESSION: " + expression);
         if (expression == null) {
             this.result = true;
             return true;
@@ -64,7 +63,6 @@ public class ExpressionEvaluator extends ExpressionDeParser {
         Long left = handleOtherDataTypes(equalsTo.getLeftExpression());
         Long right = handleOtherDataTypes(equalsTo.getRightExpression());
 
-        System.out.println("equalsto: " + left + "==" + right);
 
         result = left.equals(right);
     }
@@ -115,7 +113,6 @@ public class ExpressionEvaluator extends ExpressionDeParser {
         Long left = handleOtherDataTypes(minorThan.getLeftExpression());
         Long right = handleOtherDataTypes(minorThan.getRightExpression());
 
-        System.out.println("minorthan: " + left + "<" + right);
         result = left < right;
     }
 
@@ -131,7 +128,7 @@ public class ExpressionEvaluator extends ExpressionDeParser {
         result = left <= right;
     }
 
-    private long handleOtherDataTypes(Expression expression) {
+    public long handleOtherDataTypes(Expression expression) {
         if (expression instanceof BinaryExpression) {
             expression.accept(this);
         }
@@ -141,10 +138,9 @@ public class ExpressionEvaluator extends ExpressionDeParser {
         }
 
         if (expression instanceof Column) {
-            Column column = (Column) expression;
-            String columnName = AliasMap.resolveAlias(column.getColumnName().toLowerCase()); // Resolve alias
-            column.setColumnName(columnName);
-            return parseToLong(this.tuple.getValueFromColumn(column));
+            Column column = (Column) expression;    
+        
+            return this.tuple.getValueFromColumn(column);
         }
 
         if (expression instanceof Multiplication) {
@@ -158,27 +154,5 @@ public class ExpressionEvaluator extends ExpressionDeParser {
 
     }
 
-    /**
-     * Parses an object to a long value.
-     * 
-     * @param obj the object to be parsed
-     * @return the long value of the object
-     */
-    private long parseToLong(Object obj) {
-        
-        try {
-            if (obj instanceof Number) {
-                // If the object is already a number, cast and return its long value
-                return ((Number) obj).longValue();
-            } else {
-                // If the object is a string, attempt to parse it as a long
-                return Long.parseLong(obj.toString());
-            }
-        } catch (NumberFormatException e) {
-            // Handle the case when parsing fails
-            // For example, return a default value or throw an exception
-            return 0; // Default value
-        }
-    }
-
+    
 }

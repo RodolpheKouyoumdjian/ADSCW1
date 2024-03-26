@@ -1,5 +1,6 @@
 package ed.inf.adbs.lightdb.operators;
 
+import java.util.Arrays;
 import java.util.List;
 
 import ed.inf.adbs.lightdb.utils.Schema;
@@ -48,7 +49,7 @@ public class ProjectOperator extends Operator {
                 Column col = (Column) exp;
 
                 int idx = Schema.getInstance().getColumnIndex(col);
-                Tuple temp = new Tuple(new String[] { tuple.get(idx) }, new Column[] { tuple.getColumns()[idx] });
+                Tuple temp = new Tuple(Arrays.asList(tuple.get(idx)), Arrays.asList(tuple.getColumn(idx)));
                 resultTuple = (resultTuple == null) ? temp : resultTuple.join(temp);
             }
 

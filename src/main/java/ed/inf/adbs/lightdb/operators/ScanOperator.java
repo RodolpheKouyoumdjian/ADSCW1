@@ -3,9 +3,11 @@ package ed.inf.adbs.lightdb.operators;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import ed.inf.adbs.lightdb.DatabaseCatalog;
-import ed.inf.adbs.lightdb.utils.AliasMap;
 import ed.inf.adbs.lightdb.utils.Schema;
 import ed.inf.adbs.lightdb.utils.Tuple;
 import net.sf.jsqlparser.schema.Column;
@@ -44,8 +46,8 @@ public class ScanOperator extends Operator {
         try {
             String line = this.reader.readLine();
             if (line != null) {
-                Column[] columns = Schema.getInstance().getColumns(this.table).toArray(new Column[0]);
-                return new Tuple(line.split(", "), columns);
+                List<Column> columns = Schema.getInstance().getColumns(this.table);
+                return new Tuple(Arrays.asList(line.split(", ")), new ArrayList<>(columns));
             }
         } catch (IOException e) {
             e.printStackTrace();

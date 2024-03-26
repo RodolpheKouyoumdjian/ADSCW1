@@ -12,12 +12,12 @@ public class TableNameExtractor extends ExpressionVisitorAdapter {
 
     @Override
     public void visit(Column column) {
-        String tableName = AliasMap.resolveAlias(column.getTable().getName().toLowerCase()); // Resolve alias
-        tableNames.add(tableName);
+        String tableName = AliasMap.resolveAlias(column.getTable().getName()); // Resolve alias
+        this.tableNames.add(tableName);
     }
 
     public Set<String> getTableNames() {
-        return tableNames;
+        return new HashSet<>(tableNames);
     }
 
     public Set<String> extractTableNames(Expression expr) {

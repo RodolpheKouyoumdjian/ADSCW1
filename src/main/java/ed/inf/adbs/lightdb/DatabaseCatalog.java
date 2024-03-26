@@ -72,7 +72,6 @@ public class DatabaseCatalog {
      * @param tableName the name of the table to be added
      */
     public void addTable(String tableName) {
-        tableName = tableName.toLowerCase();
         tableLocations.put(tableName, databaseDir + File.separator + "data" + File.separator + tableName + ".csv");
     }
 
@@ -83,6 +82,6 @@ public class DatabaseCatalog {
      * @return the location of the table
      */
     public String getTableLocation(Table table) {
-        return tableLocations.get(table.getName().toLowerCase());
+        return tableLocations.get(table.getName());
     }
 }
