@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: ed.inf.adbs.lightdb.LightDBTest
 -------------------------------------------------------------------------------
-Tests run: 12, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 0.233 s <<< FAILURE! - in ed.inf.adbs.lightdb.LightDBTest
-query9(ed.inf.adbs.lightdb.LightDBTest)  Time elapsed: 0.014 s  <<< FAILURE!
+Tests run: 12, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 0.295 s <<< FAILURE! - in ed.inf.adbs.lightdb.LightDBTest
+query9(ed.inf.adbs.lightdb.LightDBTest)  Time elapsed: 0.016 s  <<< FAILURE!
 org.junit.ComparisonFailure: 
 expected:<101, 5
 10[2, 10
@@ -13,10 +13,10 @@ expected:<101, 5
 102, 10]
 104, 16
 >
-	at ed.inf.adbs.lightdb.LightDBTest.testQueries(LightDBTest.java:105)
-	at ed.inf.adbs.lightdb.LightDBTest.query9(LightDBTest.java:67)
+	at ed.inf.adbs.lightdb.LightDBTest.testQueries(LightDBTest.java:103)
+	at ed.inf.adbs.lightdb.LightDBTest.query9(LightDBTest.java:65)
 
-query10(ed.inf.adbs.lightdb.LightDBTest)  Time elapsed: 0.01 s  <<< FAILURE!
+query10(ed.inf.adbs.lightdb.LightDBTest)  Time elapsed: 0.006 s  <<< FAILURE!
 org.junit.ComparisonFailure: 
 expected:<[3
 2
@@ -25,6 +25,6 @@ expected:<[3
 1
 3]
 >
-	at ed.inf.adbs.lightdb.LightDBTest.testQueries(LightDBTest.java:105)
-	at ed.inf.adbs.lightdb.LightDBTest.query10(LightDBTest.java:81)
+	at ed.inf.adbs.lightdb.LightDBTest.testQueries(LightDBTest.java:103)
+	at ed.inf.adbs.lightdb.LightDBTest.query10(LightDBTest.java:79)
 

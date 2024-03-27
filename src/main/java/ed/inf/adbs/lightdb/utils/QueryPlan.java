@@ -40,18 +40,29 @@ public class QueryPlan {
         DatabaseCatalog.getInstance().addTable(fromItemTableName);
 
         // Populate aliasMap from FROM clause
+        // Check if the fromItem has an alias. If it does, add it to the AliasMap.
         if (fromItem.getAlias() != null) {
+            // Get the alias name from the fromItem.
             String fromItemAlias = fromItem.getAlias().getName();
+            // Add the alias and the actual table name to the AliasMap.
             AliasMap.addAlias(fromItemAlias, fromItemTableName);
         }
 
+        // If there are joins in the query, check each join for aliases.
         if (joins != null) {
+            // Iterate over each join in the query.
             for (Join join : joins) {
+                // Get the FromItem of the join.
                 FromItem joinFromItem = join.getFromItem();
+                // Get the alias of the join FromItem.
                 Alias joinAlias = joinFromItem.getAlias();
+                // If the join FromItem has an alias, add it to the AliasMap.
                 if (joinAlias != null) {
+                    // Get the actual table name from the join FromItem.
                     String joinItemActualName = joinFromItem.toString().split(" ")[0];
+                    // Get the alias name from the join FromItem.
                     String joinItemAlias = joinAlias.getName();
+                    // Add the alias and the actual table name to the AliasMap.
                     AliasMap.addAlias(joinItemAlias, joinItemActualName);
                 }
             }
@@ -111,7 +122,6 @@ public class QueryPlan {
         if (!(selectAllColumns)) {
             if ((containsSumAggregate)
                     || plainSelect.getGroupBy() != null) {
-                System.out.println("SUM OPERATOR CREATED");
                 this.rootOperator = new SumOperator(
                         this.rootOperator,
                         plainSelect);

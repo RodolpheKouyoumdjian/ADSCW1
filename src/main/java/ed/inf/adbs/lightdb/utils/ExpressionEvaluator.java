@@ -128,7 +128,7 @@ public class ExpressionEvaluator extends ExpressionDeParser {
         result = left <= right;
     }
 
-    public long handleOtherDataTypes(Expression expression) {
+    public Long handleOtherDataTypes(Expression expression) {
         if (expression instanceof BinaryExpression) {
             expression.accept(this);
         }

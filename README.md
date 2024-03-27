@@ -40,20 +40,20 @@ if (joins != null) {
    Here, plainSelect.getWhere() is the WHERE clause of the SQL query. The JoinOperator is responsible for evaluating this expression during the join operation.
 
 2. **Evaluating join condition**
-   1. First we merge the tuple obtained from the left and right operators
+   1. First we merge the tuple obtained from the left and right operators:
 
    ```java
    Tuple mergedTuple = currentLeftTuple.join(rightTuple);
    ```
 
-   2. Then we use the `ExpressionEvaluator` class to check if the merged tuple sastisfies the join condition. See #3
+   2. Then we use the `ExpressionEvaluator` (see #3) class to check if the merged tuple sastisfies the join condition.
    
    ```java
         ExpressionEvaluator evaluator = new ExpressionEvaluato(mergedTuple);
         boolean result = evaluator.evaluate(this.where);
     ```
 
-   3. Finally, if the join condition is satisfied, then we add it to the list of tuples that satisfy the condition. Doing this within the loop enables us to prevent having to compute a huge cross product and then checking the conditions for each
+   3. Finally, if the join condition is satisfied, then we add it to the list of tuples that satisfy the condition. Doing this within the loop enables us to prevent having to compute a huge cross product and then checking the conditions for each.
 
    ```java
     if (result) {

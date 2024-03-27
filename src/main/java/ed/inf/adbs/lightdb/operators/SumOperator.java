@@ -17,12 +17,28 @@ import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
+/**
+ * The SumOperator class is responsible for grouping tuples and calculating the
+ * sum for each group.
+ * It extends the Operator class and overrides its methods.
+ */
 public class SumOperator extends Operator {
-    private Operator operator;
-    private List<SelectItem<?>> selectItems;
-    private ListIterator<Tuple> groupIterator;
-    private List<Expression> groupByElements;
+    private Operator operator; // The child operator
+    private List<SelectItem<?>> selectItems; // The list of select items
+    private ListIterator<Tuple> groupIterator; // The iterator for the groups
+    private List<Expression> groupByElements; // The list of group by elements
 
+    /**
+     * Constructor for the SumOperator class.
+     * It takes an Operator and a PlainSelect statement as parameters.
+     * The Operator is the child operator that provides the tuples.
+     * The PlainSelect statement is used to extract the select items and the group
+     * by elements.
+     * 
+     * @param operator    The child operator that provides the tuples.
+     * @param plainSelect The PlainSelect statement from which to extract the select
+     *                    items and the group by elements.
+     */
     public SumOperator(Operator operator, PlainSelect plainSelect) {
         this.operator = operator;
         this.selectItems = plainSelect.getSelectItems();
@@ -36,6 +52,11 @@ public class SumOperator extends Operator {
         initGroupIterator();
     }
 
+    /**
+     * This method initializes the group iterator.
+     * It reads all tuples from the child operator, groups them by the group by
+     * elements, and calculates the sum for each group if necessary.
+     */
     private void initGroupIterator() {
         List<Tuple> temp = new ArrayList<>();
         this.groupIterator = new ArrayList<Tuple>().listIterator();
@@ -45,21 +66,27 @@ public class SumOperator extends Operator {
         Map<Tuple, List<Tuple>> groups = new HashMap<>();
         Tuple tuple;
 
+        // Read all tuples from the child operator
         while ((tuple = operator.getNextTuple()) != null) {
             Tuple groupKey = new Tuple(new ArrayList<>(), new ArrayList<>());
+
+            // If there are no group by elements, we group all tuples together
             if (groupByElements == null || groupByElements.isEmpty()) {
                 boolean keySetIsEmpty = groups.keySet().isEmpty();
+
+                // The first tuple is the key
                 if (keySetIsEmpty) {
                     groupKey = tuple;
                     groups.put(groupKey, Arrays.asList(tuple));
                 } else {
                     groupKey = new ArrayList<>(groups.keySet()).get(0);
-                    List<Tuple> group = new ArrayList<>(groups.get(groupKey));                    System.out.println("Group: " + group);
-                    System.out.println("Tuple: " + tuple);
+                    List<Tuple> group = new ArrayList<>(groups.get(groupKey));
                     group.add(tuple);
                     groups.put(groupKey, group);
                 }
+                // If there are group by elements, we group the tuples by the group by elements
             } else {
+                // Determine the group key from the tuple and add the tuple to that group
                 for (Expression groupByElement : groupByElements) {
                     Column col = (Column) groupByElement;
                     String value = tuple.getValueFromColumn(col).toString();
@@ -75,6 +102,9 @@ public class SumOperator extends Operator {
 
         }
 
+        // Handles the SELECT statement parameters and calculates the sum for each group
+        // if there are any SUM aggregates. If not, it would just behave like the
+        // ProjectOperator
         for (Tuple groupKey : groups.keySet()) {
             Tuple tupleToReturn = new Tuple(new ArrayList<>(), new ArrayList<>());
             List<Tuple> group = groups.get(groupKey);
@@ -101,21 +131,14 @@ public class SumOperator extends Operator {
                 }
             }
             temp.add(tupleToReturn);
-
         }
-
         this.groupIterator = temp.listIterator();
-
-        for (Map.Entry<Tuple, List<Tuple>> entry : groups.entrySet()) {
-            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-        }
     }
 
     /**
-     * Retrieves the next tuple that satisfies the projection.
+     * Returns the net tuple in the iterator
      *
-     * @return The next tuple that satisfies the projection, or null if there are no
-     *         more tuples.
+     * @return The next tuple in the iterator, or null if there are no more tuples.
      */
     @Override
     public Tuple getNextTuple() {
@@ -123,7 +146,7 @@ public class SumOperator extends Operator {
     }
 
     /**
-     * Resets the operator to its initial state.
+     * This method resets the child operator to its initial state.
      * This allows for re-execution of the operator.
      */
     @Override
