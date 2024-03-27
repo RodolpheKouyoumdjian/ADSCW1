@@ -33,14 +33,18 @@ if (joins != null) {
 1. **Extracting join condition**
    The WHERE clause is passed to the JoinOperator during its creation. This is done in the following line of code:
 
-   `rootOperator = new JoinOperator(rootOperator, new ScanOperator(t), plainSelect.getWhere());`
+   ```java
+   rootOperator = new JoinOperator(rootOperator, new ScanOperator(t), plainSelect.getWhere());
+   ```
 
    Here, plainSelect.getWhere() is the WHERE clause of the SQL query. The JoinOperator is responsible for evaluating this expression during the join operation.
 
 2. **Evaluating join condition**
    1. First we merge the tuple obtained from the left and right operators
 
-   `Tuple mergedTuple = currentLeftTuple.join(rightTuple);`
+   ```java
+   Tuple mergedTuple = currentLeftTuple.join(rightTuple);
+   ```
 
    2. Then we use the `ExpressionEvaluator` class to check if the merged tuple sastisfies the join condition. See #3
    ```java
