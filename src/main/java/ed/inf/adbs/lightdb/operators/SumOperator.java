@@ -48,8 +48,17 @@ public class SumOperator extends Operator {
         while ((tuple = operator.getNextTuple()) != null) {
             Tuple groupKey = new Tuple(new ArrayList<>(), new ArrayList<>());
             if (groupByElements == null || groupByElements.isEmpty()) {
-                groupKey = tuple;
-                groups.put(groupKey, Arrays.asList(tuple));
+                boolean keySetIsEmpty = groups.keySet().isEmpty();
+                if (keySetIsEmpty) {
+                    groupKey = tuple;
+                    groups.put(groupKey, Arrays.asList(tuple));
+                } else {
+                    groupKey = new ArrayList<>(groups.keySet()).get(0);
+                    List<Tuple> group = new ArrayList<>(groups.get(groupKey));                    System.out.println("Group: " + group);
+                    System.out.println("Tuple: " + tuple);
+                    group.add(tuple);
+                    groups.put(groupKey, group);
+                }
             } else {
                 for (Expression groupByElement : groupByElements) {
                     Column col = (Column) groupByElement;
@@ -65,8 +74,6 @@ public class SumOperator extends Operator {
             }
 
         }
-
-        System.out.println("GROUPS: " + groups.keySet().toString());
 
         for (Tuple groupKey : groups.keySet()) {
             Tuple tupleToReturn = new Tuple(new ArrayList<>(), new ArrayList<>());
@@ -98,6 +105,10 @@ public class SumOperator extends Operator {
         }
 
         this.groupIterator = temp.listIterator();
+
+        for (Map.Entry<Tuple, List<Tuple>> entry : groups.entrySet()) {
+            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+        }
     }
 
     /**

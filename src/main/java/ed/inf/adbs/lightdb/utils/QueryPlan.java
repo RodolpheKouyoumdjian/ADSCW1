@@ -81,26 +81,30 @@ public class QueryPlan {
         // If GROUP BY clause exists, create a GroupByOperator
         // Print in pink if group by is null
         // If not all columns are selected, create a ProjectOperator
-
-        List<SelectItem<?>> firstSelectItemExpression = plainSelect.getSelectItems();
+        List<SelectItem<?>> selectItems = plainSelect.getSelectItems();
         boolean containsSumAggregate = false;
-        for (SelectItem<?> selectItem : firstSelectItemExpression) {
+        boolean selectAllColumns = false;
+        for (SelectItem<?> selectItem : selectItems) {
             Expression exp = selectItem.getExpression();
             if (exp instanceof Function) {
                 if (((Function) exp).getName().equals("SUM")) {
                     containsSumAggregate = true;
                     break;
                 }
+            } else if (exp instanceof AllColumns) {
+                selectAllColumns = true;
+                if (selectItems.size() > 1) {
+                    throw new UnsupportedOperationException("Cannot select all columns with other columns");
+                }
             }
         }
-        if (!(firstSelectItemExpression instanceof AllColumns)) {
+        if (!(selectAllColumns)) {
             if ((containsSumAggregate)
                     || plainSelect.getGroupBy() != null) {
-                        System.out.println("SUM OPERATOR CREATED");
+                System.out.println("SUM OPERATOR CREATED");
                 this.rootOperator = new SumOperator(
-                    this.rootOperator, 
-                    plainSelect
-                );
+                        this.rootOperator,
+                        plainSelect);
             } else {
                 this.rootOperator = new ProjectOperator(this.rootOperator, select);
             }

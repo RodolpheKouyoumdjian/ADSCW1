@@ -28,6 +28,7 @@ public class ProjectOperator extends Operator {
      * @param select   The Select statement that specifies the projection.
      */
     public ProjectOperator(Operator operator, Select select) {
+        System.out.println("CREATED PROJECT OPERATOR");
         this.operator = operator;
         this.selectItems = select.getPlainSelect().getSelectItems();
     }
