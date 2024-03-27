@@ -42,7 +42,7 @@ if (joins != null) {
 
    `Tuple mergedTuple = currentLeftTuple.join(rightTuple);`
 
-   2. Then we use the `ExpressionEvaluator` class to check if the merged tuple sastisfies the   join condition. See #3
+   2. Then we use the `ExpressionEvaluator` class to check if the merged tuple sastisfies the join condition. See #3
    ```java
         ExpressionEvaluator evaluator = new ExpressionEvaluato(mergedTuple);
         boolean result = evaluator.evaluate(this.where);
@@ -56,4 +56,4 @@ if (joins != null) {
     }
    ```
 3. **ExpressionEvaluator**
-   This class is responsible to processing the `WHERE` clause. It extends `ExpressionDeParser`as per the instructions.
+   This class is responsible to processing the `WHERE` clause. It extends `ExpressionDeParser` as per the instructions.
