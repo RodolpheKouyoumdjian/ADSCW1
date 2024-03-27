@@ -127,65 +127,65 @@ public class LightDBTest {
 	// TestUtils.readFile(actualOutputFilePath));
 	// }
 
+	// @Test
+	// public void query9() throws IOException {
+	// System.out.println("\u001B[35m" + "########## QUERY 9 ##########" +
+	// "\u001B[0m");
+
+	// String[] args = { "samples/db", "samples/input/query9.sql",
+	// "samples/output/query9.csv" };
+	// LightDB.main(args);
+
+	// String expectedOutputFilePath = "samples/expected_output/query9.csv";
+	// String actualOutputFilePath = "samples/output/query9.csv";
+	// assertEquals(TestUtils.readFile(expectedOutputFilePath),
+	// TestUtils.readFile(actualOutputFilePath));
+	// }
+
 	@Test
-	public void query9() throws IOException {
-	System.out.println("\u001B[35m" + "########## QUERY 9 ##########" +
-	"\u001B[0m");
+	public void query10() throws IOException {
+		System.out.println("\u001B[35m" + "########## QUERY 10 ##########" +
+				"\u001B[0m");
 
-	String[] args = { "samples/db", "samples/input/query9.sql",
-	"samples/output/query9.csv" };
-	LightDB.main(args);
+		String[] args = { "samples/db", "samples/input/query10.sql",
+				"samples/output/query10.csv" };
+		LightDB.main(args);
 
-	String expectedOutputFilePath = "samples/expected_output/query9.csv";
-	String actualOutputFilePath = "samples/output/query9.csv";
-	assertEquals(TestUtils.readFile(expectedOutputFilePath),
-	TestUtils.readFile(actualOutputFilePath));
+		String expectedOutputFilePath = "samples/expected_output/query10.csv";
+		String actualOutputFilePath = "samples/output/query10.csv";
+		assertEquals(TestUtils.readFile(expectedOutputFilePath),
+				TestUtils.readFile(actualOutputFilePath));
 	}
 
-	// @Test
-	// public void query10() throws IOException {
-	// System.out.println("\u001B[35m" + "########## QUERY 10 ##########" +
-	// "\u001B[0m");
+	@Test
+	public void query11() throws IOException {
+		System.out.println("\u001B[35m" + "########## QUERY 11 ##########" +
+				"\u001B[0m");
 
-	// String[] args = { "samples/db", "samples/input/query10.sql",
-	// "samples/output/query10.csv" };
-	// LightDB.main(args);
+		String[] args = { "samples/db", "samples/input/query11.sql",
+				"samples/output/query11.csv" };
+		LightDB.main(args);
 
-	// String expectedOutputFilePath = "samples/expected_output/query10.csv";
-	// String actualOutputFilePath = "samples/output/query10.csv";
-	// assertEquals(TestUtils.readFile(expectedOutputFilePath),
-	// TestUtils.readFile(actualOutputFilePath));
-	// }
+		String expectedOutputFilePath = "samples/expected_output/query11.csv";
+		String actualOutputFilePath = "samples/output/query11.csv";
+		assertEquals(TestUtils.readFile(expectedOutputFilePath),
+				TestUtils.readFile(actualOutputFilePath));
+	}
 
-	// @Test
-	// public void query11() throws IOException {
-	// System.out.println("\u001B[35m" + "########## QUERY 11 ##########" +
-	// "\u001B[0m");
+	@Test
+	public void query12() throws IOException {
+		System.out.println("\u001B[35m" + "########## QUERY 12 ##########" +
+				"\u001B[0m");
 
-	// String[] args = { "samples/db", "samples/input/query11.sql",
-	// "samples/output/query11.csv" };
-	// LightDB.main(args);
+		String[] args = { "samples/db", "samples/input/query12.sql",
+				"samples/output/query12.csv" };
+		LightDB.main(args);
 
-	// String expectedOutputFilePath = "samples/expected_output/query11.csv";
-	// String actualOutputFilePath = "samples/output/query11.csv";
-	// assertEquals(TestUtils.readFile(expectedOutputFilePath),
-	// TestUtils.readFile(actualOutputFilePath));
-	// }
-
-	// @Test
-	// public void query12() throws IOException {
-	// 	System.out.println("\u001B[35m" + "########## QUERY 12 ##########" +
-	// 			"\u001B[0m");
-
-	// 	String[] args = { "samples/db", "samples/input/query12.sql",
-	// 			"samples/output/query12.csv" };
-	// 	LightDB.main(args);
-
-	// 	String expectedOutputFilePath = "samples/expected_output/query12.csv";
-	// 	String actualOutputFilePath = "samples/output/query12.csv";
-	// 	assertEquals(TestUtils.readFile(expectedOutputFilePath),
-	// 			TestUtils.readFile(actualOutputFilePath));
-	// }
+		String expectedOutputFilePath = "samples/expected_output/query12.csv";
+		String actualOutputFilePath = "samples/output/query12.csv";
+		assertEquals(TestUtils.readFile(expectedOutputFilePath),
+				TestUtils.readFile(actualOutputFilePath));
+	}
 
 	// @Test
 	// public void expressionEvaluatorEQUALSTO() {

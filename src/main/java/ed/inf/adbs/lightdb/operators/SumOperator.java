@@ -1,20 +1,17 @@
 package ed.inf.adbs.lightdb.operators;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.ListIterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Collections;
-import java.util.Comparator;
 
+import ed.inf.adbs.lightdb.utils.CastList;
 import ed.inf.adbs.lightdb.utils.ExpressionEvaluator;
-import ed.inf.adbs.lightdb.utils.Schema;
 import ed.inf.adbs.lightdb.utils.Tuple;
-import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -23,64 +20,84 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 public class SumOperator extends Operator {
     private Operator operator;
     private List<SelectItem<?>> selectItems;
-    private Iterator<Tuple> groupIterator;
+    private ListIterator<Tuple> groupIterator;
     private List<Expression> groupByElements;
 
     public SumOperator(Operator operator, PlainSelect plainSelect) {
         this.operator = operator;
         this.selectItems = plainSelect.getSelectItems();
-        this.groupByElements = plainSelect.getGroupBy().getGroupByExpressionList();
-        plainSelect.getGroupBy();
+        GroupByElement groupByElement = plainSelect.getGroupBy();
+        if (groupByElement == null) {
+            this.groupByElements = null;
+        } else {
+            this.groupByElements = CastList.castList(Expression.class,
+                    plainSelect.getGroupBy().getGroupByExpressionList());
+        }
         initGroupIterator();
     }
 
     private void initGroupIterator() {
+        List<Tuple> temp = new ArrayList<>();
+        this.groupIterator = new ArrayList<Tuple>().listIterator();
+        // We should have a map of tuples to group mappings
+        // Each key is a representant of the group
+        // Each value is the actual group
+        Map<Tuple, List<Tuple>> groups = new HashMap<>();
         Tuple tuple;
-        List<Tuple> tuples = new ArrayList<>();
 
         while ((tuple = operator.getNextTuple()) != null) {
-            Tuple resultTuple = null;
-            for (SelectItem<?> item : this.selectItems) {
-                Expression exp = item.getExpression();
-                if (exp instanceof Column) {
-                    Column col = (Column) exp;
-    
-                    int idx = Schema.getInstance().getColumnIndex(col);
-                    Tuple temp = new Tuple(Arrays.asList(tuple.get(idx)), Arrays.asList(tuple.getColumn(idx)));
-                    resultTuple = (resultTuple == null) ? temp : resultTuple.join(temp);
-                } else if (exp instanceof Function && ((Function) exp).getName().equals("SUM")) {
-                    Function function = (Function) exp;
-                    ExpressionList parameters = function.getParameters();
-                    List<Expression> expressions = parameters.getExpressions();
-                    Expression sumExpression = expressions.get(0);
-                    ExpressionEvaluator evaluator = new ExpressionEvaluator(tuple);
-                    Long evaluated = evaluator.handleOtherDataTypes(sumExpression);
-                    Tuple temp = new Tuple(Arrays.asList(evaluated.toString()), Arrays.asList(new Column(sumExpression.toString())));
-                    resultTuple = (resultTuple == null) ? temp : resultTuple.join(temp);
+            Tuple groupKey = new Tuple(new ArrayList<>(), new ArrayList<>());
+            if (groupByElements == null || groupByElements.isEmpty()) {
+                groupKey = tuple;
+                groups.put(groupKey, Arrays.asList(tuple));
+            } else {
+                for (Expression groupByElement : groupByElements) {
+                    Column col = (Column) groupByElement;
+                    String value = tuple.getValueFromColumn(col).toString();
+                    groupKey = groupKey.join(new Tuple(Arrays.asList(value), Arrays.asList(col)));
                 }
+                List<Tuple> group = groups.get(groupKey);
+                if (group == null) {
+                    group = new ArrayList<Tuple>();
+                }
+                group.add(tuple);
+                groups.put(groupKey, group);
             }
-            tuples.add(resultTuple);
+
         }
 
-        // Group the tuples if necessary
-        if (this.groupByElements == null) {
-            groupIterator = tuples.iterator();
-        } else {
-            Collections.sort(tuples, new Comparator<Tuple>() {
-                @Override
-                public int compare(Tuple t1, Tuple t2) {
-                    for (Expression groupByElement : groupByElements) {
-                        Column column = (Column) groupByElement;
-                        int comparison = t1.getValueFromColumn(column).compareTo(t2.getValueFromColumn(column));
-                        if (comparison != 0) {
-                            return comparison;
-                        }
+        System.out.println("GROUPS: " + groups.keySet().toString());
+
+        for (Tuple groupKey : groups.keySet()) {
+            Tuple tupleToReturn = new Tuple(new ArrayList<>(), new ArrayList<>());
+            List<Tuple> group = groups.get(groupKey);
+
+            for (SelectItem<?> selectItem : this.selectItems) {
+                Expression exp = selectItem.getExpression();
+                if (exp instanceof Column) {
+                    Column col = (Column) exp;
+                    String value = group.get(0).getValueFromColumn(col).toString();
+                    tupleToReturn = tupleToReturn.join(new Tuple(Arrays.asList(value), Arrays.asList(col)));
+                } else if (exp instanceof Function && ((Function) exp).getName().equals("SUM")) {
+                    Function function = (Function) exp;
+                    List<Expression> expressions = CastList.castList(Expression.class, function.getParameters());
+                    Expression sumExpression = expressions.get(0);
+
+                    Long sum = 0L;
+                    for (Tuple groupTuple : group) {
+                        ExpressionEvaluator evaluator = new ExpressionEvaluator(groupTuple);
+                        Long evaluated = evaluator.handleOtherDataTypes(sumExpression);
+                        sum += evaluated;
                     }
-                    return 0;
+                    tupleToReturn = tupleToReturn.join(new Tuple(Arrays.asList(sum.toString()),
+                            Arrays.asList(new Column(sumExpression.toString()))));
                 }
-            });
+            }
+            temp.add(tupleToReturn);
+
         }
-        this.groupIterator = tuples.iterator();
+
+        this.groupIterator = temp.listIterator();
     }
 
     /**

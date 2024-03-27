@@ -96,6 +96,7 @@ public class QueryPlan {
         if (!(firstSelectItemExpression instanceof AllColumns)) {
             if ((containsSumAggregate)
                     || plainSelect.getGroupBy() != null) {
+                        System.out.println("SUM OPERATOR CREATED");
                 this.rootOperator = new SumOperator(
                     this.rootOperator, 
                     plainSelect
