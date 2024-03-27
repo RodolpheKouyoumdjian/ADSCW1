@@ -10,8 +10,17 @@ import ed.inf.adbs.lightdb.utils.Tuple;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
-import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 
+/**
+ * The SelectOperator class represents a SELECT operation in a SQL query.
+ * It extends the Operator class and overrides its methods to provide
+ * the functionality of a SELECT operation. The SelectOperator acts as the root
+ * and the ScanOperator as its child in the query plan. During evaluation, the
+ * SelectOperator’s getNextTuple() method will grab the next tuple from its
+ * child,
+ * check if that tuple passes the selection condition, and if so output it.
+ */
 public class SelectOperator extends Operator {
     private ScanOperator operator;
     private Expression where;
@@ -19,12 +28,13 @@ public class SelectOperator extends Operator {
     /**
      * Constructor for SelectOperator.
      * 
-     * @param operator the input operator
-     * @param select   the SELECT statement
+     * @param operator    the ScanOperator which acts as the child in the query plan
+     * @param plainSelect the SELECT statement from the SQL query
+     * @throws IllegalArgumentException if a table in the WHERE clause is not included in the FROM clause
      */
-    public SelectOperator(ScanOperator operator, Select select) {
+    public SelectOperator(ScanOperator operator, PlainSelect plainSelect) {
         this.operator = operator;
-        this.where = select.getPlainSelect().getWhere();
+        this.where = plainSelect.getWhere();
 
         // Extract table names from WHERE clause
         TableNameExtractor extractor = new TableNameExtractor();
@@ -32,11 +42,11 @@ public class SelectOperator extends Operator {
 
         // Extract table names from FROM clause
         Set<String> fromTables = new HashSet<>();
-        FromItem fromItem = select.getPlainSelect().getFromItem();
+        FromItem fromItem = plainSelect.getPlainSelect().getFromItem();
         fromTables.add(AliasMap.resolveAlias(fromItem.getAlias().getName()));
 
-        if (select.getPlainSelect().getJoins() != null) {
-            for (Join join : select.getPlainSelect().getJoins()) {
+        if (plainSelect.getJoins() != null) {
+            for (Join join : plainSelect.getJoins()) {
                 fromTables.add(AliasMap.resolveAlias(join.getRightItem().getAlias().getName()));
             }
         }
@@ -52,7 +62,8 @@ public class SelectOperator extends Operator {
      * Retrieves the next tuple that satisfies the WHERE condition.
      * 
      * @return the next tuple that satisfies the WHERE condition, or null if no more
-     *         tuples
+     *         tuples. The method will continue pulling tuples from the scan until
+     *         either it finds one that passes or it receives null.
      */
     @Override
     public Tuple getNextTuple() {
@@ -70,6 +81,7 @@ public class SelectOperator extends Operator {
 
     /**
      * Resets the operator to its initial state.
+     * This allows for re-execution of the operator.
      */
     @Override
     public void reset() {

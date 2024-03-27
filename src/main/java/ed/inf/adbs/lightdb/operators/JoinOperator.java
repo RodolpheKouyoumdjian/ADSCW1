@@ -7,11 +7,23 @@ import ed.inf.adbs.lightdb.utils.ExpressionEvaluator;
 import ed.inf.adbs.lightdb.utils.Tuple;
 import net.sf.jsqlparser.expression.Expression;
 
+/**
+ * The JoinOperator class is responsible for handling implicit joins and
+ * Cartesian products in a SQL query.
+ */
 public class JoinOperator extends Operator {
     private Operator leftOperator;
     private Operator rightOperator;
     private Expression where;
 
+    /**
+     * Constructs a JoinOperator with the given left and right operators and join
+     * condition.
+     *
+     * @param leftOperator  The operator for the left relation of the join.
+     * @param rightOperator The operator for the right relation of the join.
+     * @param where         The join condition.
+     */
     public JoinOperator(Operator leftOperator, Operator rightOperator, Expression where) {
         leftOperator.reset();
         rightOperator.reset();
@@ -23,6 +35,12 @@ public class JoinOperator extends Operator {
     private List<Tuple> matchedTuples = new ArrayList<>();
     private Tuple currentLeftTuple;
 
+    /**
+     * Returns the next tuple that satisfies the join condition.
+     *
+     * @return The next tuple that satisfies the join condition, or null if there
+     *         are no more tuples.
+     */
     @Override
     public Tuple getNextTuple() {
         Tuple rightTuple;
@@ -42,8 +60,12 @@ public class JoinOperator extends Operator {
             while ((rightTuple = rightOperator.getNextTuple()) != null) {
                 // Evaluate the join condition
                 Tuple mergedTuple = currentLeftTuple.join(rightTuple);
+
+                // Extracting join conditions from the WHERE clause and evaluating them as part of the join
                 ExpressionEvaluator evaluator = new ExpressionEvaluator(mergedTuple);
                 boolean result = evaluator.evaluate(this.where);
+
+                // Prevents computing cross products by checking if the join condition is satisfied
                 if (result) {
                     // If join condition is satisfied, add the joined tuple to the list
                     matchedTuples.add(mergedTuple);
@@ -53,6 +75,10 @@ public class JoinOperator extends Operator {
             rightOperator.reset();
         }
     }
+
+    /**
+     * Resets the state of the operator, allowing it to be used again.
+     */
     @Override
     public void reset() {
         leftOperator.reset(); // Reset both left and right operators

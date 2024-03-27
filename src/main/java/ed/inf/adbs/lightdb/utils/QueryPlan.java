@@ -68,13 +68,23 @@ public class QueryPlan {
                 String joinTableName = join.getRightItem().toString().split(" ")[0];
                 DatabaseCatalog.getInstance().addTable(joinTableName);
                 t = new Table(joinTableName).withAlias(join.getRightItem().getAlias());
+
+                // Here, a new JoinOperator is created for each join in the query.
+                // The current rootOperator (which could be a ScanOperator for the first join,
+                // or another JoinOperator for subsequent joins)
+                // is set as the left child of the new JoinOperator, and a new ScanOperator for
+                // the join table is set as the right child.
+                // The rootOperator is then updated to be this new JoinOperator.
+                // This process effectively creates a left-deep join tree because each new join
+                // is always added to the right of the current tree,
+                // making the existing tree the left child of the new join.
                 rootOperator = new JoinOperator(rootOperator, new ScanOperator(t),
-                        select.getPlainSelect().getWhere());
+                        plainSelect.getWhere());
             }
         } else {
             // Create SelectOperator if WHERE clause exists, else use the ScanOperator
             if (plainSelect.getWhere() != null) {
-                this.rootOperator = new SelectOperator(scanOperator, select);
+                this.rootOperator = new SelectOperator(scanOperator, plainSelect);
             }
         }
 
