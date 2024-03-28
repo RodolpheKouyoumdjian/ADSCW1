@@ -119,4 +119,4 @@ Memory efficient implementation of JoinOperator (explained previously)
 The implementation computes tuples 1 by 1 instead of everything at once
 
 # Bugs/Behavior
-No bugs per se but Test Query 10 for example has the correct output but not in the same order. Since there is no ORDER BY query in the SQL statement, I do not believe it should be a problem. This is confirmed by Question @98 on Piazza
+No bugs per se but some test queries outputs were not in the same order as the expected output. Since there was no ORDER BY query in the SQL statement, I do not believe it should be a problem. This is confirmed by Question @98 on Piazza

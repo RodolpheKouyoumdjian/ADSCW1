@@ -90,10 +90,6 @@ public class LightDBTest {
 	}
 
 	public void testQueries(Integer q) throws IOException {
-
-		System.out.println("\u001B[35m" + "########## QUERY " + q + " ##########" +
-				"\u001B[0m");
-
 		String[] args = { "samples/db", "samples/input/query" + q + ".sql",
 				"samples/output/query" + q + ".csv" };
 		LightDB.main(args);
