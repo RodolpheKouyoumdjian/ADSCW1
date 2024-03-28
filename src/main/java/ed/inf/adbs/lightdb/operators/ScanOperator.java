@@ -20,6 +20,7 @@ import net.sf.jsqlparser.schema.Table;
 public class ScanOperator extends Operator {
     private BufferedReader reader;
     private Table table;
+    private List<Column> columns;
 
     /**
      * Constructs a ScanOperator object with the specified table name.
@@ -28,6 +29,8 @@ public class ScanOperator extends Operator {
      */
     public ScanOperator(Table table) {
         this.table = table;
+        this.columns = Schema.getInstance().getColumns(this.table);
+
         try {
             String tableFilePath = DatabaseCatalog.getInstance().getTableLocation(this.table);
             this.reader = new BufferedReader(new FileReader(tableFilePath));
@@ -46,8 +49,7 @@ public class ScanOperator extends Operator {
         try {
             String line = this.reader.readLine();
             if (line != null) {
-                List<Column> columns = Schema.getInstance().getColumns(this.table);
-                return new Tuple(Arrays.asList(line.split(", ")), new ArrayList<>(columns));
+                return new Tuple(Arrays.asList(line.split(", ")), new ArrayList<>(this.columns));
             }
         } catch (IOException e) {
             e.printStackTrace();

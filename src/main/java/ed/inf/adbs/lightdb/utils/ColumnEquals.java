@@ -5,6 +5,11 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 
 public class ColumnEquals {
+    /**
+     * Updates the table of the column if the table name is an alias.
+     *
+     * @param column The column whose table may need to be updated.
+     */
     private static void setColumnTableAlias(Column column) {
         // Check if the column table name is a key in the table map or if it is an alias
         // If it is an alias, get the actual table name and the current alias and update
@@ -20,6 +25,15 @@ public class ColumnEquals {
         }
     }
 
+    /**
+     * Checks if two columns are equal, optionally considering their table aliases.
+     *
+     * @param column1    The first column to compare.
+     * @param column2    The second column to compare.
+     * @param checkAlias If true, the table aliases of the columns are considered in
+     *                   the comparison.
+     * @return true if the columns are equal, false otherwise.
+     */
     public static boolean equals(Column column1, Column column2, boolean checkAlias) {
         setColumnTableAlias(column1);
         setColumnTableAlias(column2);

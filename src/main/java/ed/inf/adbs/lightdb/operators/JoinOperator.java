@@ -71,7 +71,7 @@ public class JoinOperator extends Operator {
                     matchedTuples.add(mergedTuple);
                 }
             }
-            // Reset the right operator after iterating through all its tuples
+            // Reset the right operator after iterating through all its tuples, essentially creating a nested loop
             rightOperator.reset();
         }
     }

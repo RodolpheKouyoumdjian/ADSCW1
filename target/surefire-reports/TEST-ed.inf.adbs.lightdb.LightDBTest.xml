@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="ed.inf.adbs.lightdb.LightDBTest" time="0.295" tests="12" errors="0" skipped="0" failures="2">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="ed.inf.adbs.lightdb.LightDBTest" time="0.24" tests="12" errors="0" skipped="0" failures="1">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -12,7 +12,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="CA"/>
     <property name="sun.boot.library.path" value="/usr/local/Cellar/openjdk/21.0.2/libexec/openjdk.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/rudy/Desktop/McGill/Winter 2024/Advanced Database Systems/New/target/surefire/surefirebooter14351353266846321638.jar /Users/rudy/Desktop/McGill/Winter 2024/Advanced Database Systems/New/target/surefire 2024-03-27T22-45-25_611-jvmRun1 surefire6695666200555996515tmp surefire_013020280241950937435tmp"/>
+    <property name="sun.java.command" value="/Users/rudy/Desktop/McGill/Winter 2024/Advanced Database Systems/New/target/surefire/surefirebooter4879180129498403279.jar /Users/rudy/Desktop/McGill/Winter 2024/Advanced Database Systems/New/target/surefire 2024-03-28T04-09-12_897-jvmRun1 surefire11248723387250127890tmp surefire_07353706450664151300tmp"/>
     <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/Users/rudy/Desktop/McGill/Winter 2024/Advanced Database Systems/New/target/test-classes:/Users/rudy/Desktop/McGill/Winter 2024/Advanced Database Systems/New/target/classes:/Users/rudy/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/Users/rudy/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/rudy/.m2/repository/com/github/jsqlparser/jsqlparser/4.7/jsqlparser-4.7.jar:"/>
@@ -29,7 +29,7 @@
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="apple.awt.application.name" value="ForkedBooter"/>
-    <property name="surefire.real.class.path" value="/Users/rudy/Desktop/McGill/Winter 2024/Advanced Database Systems/New/target/surefire/surefirebooter14351353266846321638.jar"/>
+    <property name="surefire.real.class.path" value="/Users/rudy/Desktop/McGill/Winter 2024/Advanced Database Systems/New/target/surefire/surefirebooter4879180129498403279.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.runtime.version" value="21.0.2"/>
@@ -58,55 +58,30 @@
     <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="query1" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.139"/>
-  <testcase name="query2" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.004"/>
-  <testcase name="query3" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.005"/>
-  <testcase name="query4" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.022"/>
-  <testcase name="query5" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.011"/>
-  <testcase name="query6" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.007"/>
-  <testcase name="query7" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.005"/>
-  <testcase name="query8" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.01"/>
-  <testcase name="query9" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.016">
-    <failure message="expected:&lt;101, 5&#10;10[2, 10&#10;103, 1]&#10;104, 16&#10;&gt; but was:&lt;101, 5&#10;10[3, 1&#10;102, 10]&#10;104, 16&#10;&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
-expected:<101, 5
-10[2, 10
-103, 1]
-104, 16
-> but was:<101, 5
-10[3, 1
-102, 10]
-104, 16
->
-	at ed.inf.adbs.lightdb.LightDBTest.testQueries(LightDBTest.java:103)
-	at ed.inf.adbs.lightdb.LightDBTest.query9(LightDBTest.java:65)
-]]></failure>
-    <system-out><![CDATA[&amp#27;[35m########## QUERY 9 ##########&amp#27;[0m
-SUM OPERATOR CREATED
-Key = 101, Value = [1, 101, 2, 101]
-Key = 103, Value = [1, 103]
-Key = 102, Value = [1, 102, 3, 102]
-Key = 104, Value = [4, 104]
-]]></system-out>
-  </testcase>
-  <testcase name="query10" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.006">
-    <failure message="expected:&lt;[3&#10;2&#10;1]&#10;&gt; but was:&lt;[2&#10;1&#10;3]&#10;&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
+  <testcase name="query1" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.088"/>
+  <testcase name="query2" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.007"/>
+  <testcase name="query3" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.006"/>
+  <testcase name="query4" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.019"/>
+  <testcase name="query5" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.01"/>
+  <testcase name="query6" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.008"/>
+  <testcase name="query7" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.006"/>
+  <testcase name="query8" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.005"/>
+  <testcase name="query9" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.011"/>
+  <testcase name="query10" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.012">
+    <failure message="expected:&lt;[3&#10;2&#10;1]&#10;&gt; but was:&lt;[1&#10;3&#10;2]&#10;&gt;" type="org.junit.ComparisonFailure"><![CDATA[org.junit.ComparisonFailure: 
 expected:<[3
 2
 1]
-> but was:<[2
-1
-3]
+> but was:<[1
+3
+2]
 >
 	at ed.inf.adbs.lightdb.LightDBTest.testQueries(LightDBTest.java:103)
 	at ed.inf.adbs.lightdb.LightDBTest.query10(LightDBTest.java:79)
 ]]></failure>
     <system-out><![CDATA[&amp#27;[35m########## QUERY 10 ##########&amp#27;[0m
-SUM OPERATOR CREATED
-Key = 200, Value = [1, 200, 50, 2, 200, 200]
-Key = 300, Value = [6, 300, 400]
-Key = 100, Value = [3, 100, 105, 4, 100, 50, 5, 100, 500]
 ]]></system-out>
   </testcase>
-  <testcase name="query11" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.008"/>
-  <testcase name="query12" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.015"/>
+  <testcase name="query11" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.009"/>
+  <testcase name="query12" classname="ed.inf.adbs.lightdb.LightDBTest" time="0.008"/>
 </testsuite>

@@ -36,14 +36,7 @@ public class DuplicateEliminationOperator extends Operator {
     public Tuple getNextTuple() {
         Tuple tuple;
         while ((tuple = operator.getNextTuple()) != null) {
-            boolean contains = false;
-            for (Tuple t : seenTuples) {
-                if (t.equals(tuple)) {
-                    contains = true;
-                    break;
-                }
-            }
-            if (!contains) {
+            if (!seenTuples.contains(tuple)) {
                 seenTuples.add(tuple);
                 return tuple;
             }
@@ -51,9 +44,6 @@ public class DuplicateEliminationOperator extends Operator {
         return null;
     }
 
-    /**
-     * This method resets the child operator and clears the set of seen tuples.
-     */
     @Override
     public void reset() {
         operator.reset();

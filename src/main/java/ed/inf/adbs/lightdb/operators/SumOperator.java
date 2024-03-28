@@ -68,6 +68,7 @@ public class SumOperator extends Operator {
 
         // Read all tuples from the child operator
         while ((tuple = operator.getNextTuple()) != null) {
+            // Hashing algorithm (each tuple creates a key for the group)
             Tuple groupKey = new Tuple(new ArrayList<>(), new ArrayList<>());
 
             // If there are no group by elements, we group all tuples together

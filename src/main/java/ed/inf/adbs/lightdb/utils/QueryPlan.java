@@ -11,10 +11,10 @@ import ed.inf.adbs.lightdb.operators.ScanOperator;
 import ed.inf.adbs.lightdb.operators.SelectOperator;
 import ed.inf.adbs.lightdb.operators.SortOperator;
 import ed.inf.adbs.lightdb.operators.SumOperator;
+import ed.inf.adbs.lightdb.operators.VoidOperator;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.AllColumns;
@@ -23,6 +23,7 @@ import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
+import java.util.Map;
 
 public class QueryPlan {
     private Operator rootOperator;
@@ -30,14 +31,29 @@ public class QueryPlan {
     public QueryPlan(Statement statement) {
         Select select = (Select) statement;
         PlainSelect plainSelect = select.getPlainSelect();
+
+        // Check if the WHERE clause is invariant
+        // Prevents creating unnecessary SelectOperator if the WHERE clause is always
+        // true or always false
+        if (plainSelect.getWhere() != null) {
+            ExpressionEvaluator whereEvaluator = new ExpressionEvaluator(null);
+            Map<String, Boolean> optimizeMap = whereEvaluator.checkIfWhereIsInvariant(plainSelect.getWhere());
+
+            if (optimizeMap.get("isInvariant")) {
+                if (optimizeMap.get("value")) {
+                    plainSelect.setWhere(null);
+                } else {
+                    this.rootOperator = new VoidOperator();
+                    return;
+                }
+            }
+        }
+
         List<Join> joins = plainSelect.getJoins();
 
         // Extract the table name from the FROM clause
         FromItem fromItem = plainSelect.getFromItem();
         String fromItemTableName = fromItem.toString().split(" ")[0];
-
-        // Add the table to the DatabaseCatalog
-        DatabaseCatalog.getInstance().addTable(fromItemTableName);
 
         // Populate aliasMap from FROM clause
         // Check if the fromItem has an alias. If it does, add it to the AliasMap.
@@ -47,6 +63,9 @@ public class QueryPlan {
             // Add the alias and the actual table name to the AliasMap.
             AliasMap.addAlias(fromItemAlias, fromItemTableName);
         }
+
+        // Add the table to the DatabaseCatalog
+        DatabaseCatalog.getInstance().addTable(fromItemTableName);
 
         // If there are joins in the query, check each join for aliases.
         if (joins != null) {
@@ -89,7 +108,7 @@ public class QueryPlan {
                 // This process effectively creates a left-deep join tree because each new join
                 // is always added to the right of the current tree,
                 // making the existing tree the left child of the new join.
-                rootOperator = new JoinOperator(rootOperator, new ScanOperator(t),
+                rootOperator = new JoinOperator(this.rootOperator, new ScanOperator(t),
                         plainSelect.getWhere());
             }
         } else {
@@ -126,7 +145,7 @@ public class QueryPlan {
                         this.rootOperator,
                         plainSelect);
             } else {
-                this.rootOperator = new ProjectOperator(this.rootOperator, select);
+                this.rootOperator = new ProjectOperator(this.rootOperator, plainSelect);
             }
         }
 
@@ -137,7 +156,7 @@ public class QueryPlan {
 
         // If ORDER BY clause exists, create a SortOperator
         if (plainSelect.getOrderByElements() != null) {
-            this.rootOperator = new SortOperator(this.rootOperator, select);
+            this.rootOperator = new SortOperator(this.rootOperator, plainSelect);
         }
 
     }

@@ -9,7 +9,7 @@ import ed.inf.adbs.lightdb.utils.ExpressionEvaluator;
 import ed.inf.adbs.lightdb.utils.Tuple;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 
 /**
  * The SortOperator class is responsible for sorting the tuples produced by a
@@ -30,9 +30,9 @@ public class SortOperator extends Operator {
      * @param select   The Select statement from which to extract the ORDER BY
      *                 clause.
      */
-    public SortOperator(Operator operator, Select select) {
+    public SortOperator(Operator operator, PlainSelect plainSelect) {
         this.operator = operator;
-        this.orderByElements = select.getOrderByElements();
+        this.orderByElements = plainSelect.getOrderByElements();
         this.tuples = new ArrayList<>();
         Tuple tuple;
         while ((tuple = operator.getNextTuple()) != null) {

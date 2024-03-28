@@ -88,14 +88,33 @@ public class Tuple {
         return values.size();
     }
 
+
+    /**
+     * Returns the columns of the tuple.
+     *
+     * @return the columns of the tuple
+     */
     public List<Column> getColumns() {
         return new ArrayList<>(columns);
     }
 
+
+    /**
+     * Returns the column at the specified index in the tuple.
+     *
+     * @param index the index of the column to retrieve
+     * @return the column at the specified index
+     */
     public Column getColumn(int index) {
         return columns.get(index);
     }
 
+    /**
+     * Returns the value of the tuple for the given column.
+     *
+     * @param column the column to retrieve the value for
+     * @return the value of the tuple for the given column
+     */
     public Long getValueFromColumn(Column column) {
 
         for (int i = 0; i < columns.size(); i++) {
@@ -117,6 +136,12 @@ public class Tuple {
         return result;
     }
 
+    /**
+     * Checks if this tuple is equal to the given object.
+     *
+     * @param obj the object to compare to
+     * @return true if this tuple is equal to the given object, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

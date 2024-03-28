@@ -7,6 +7,7 @@ import ed.inf.adbs.lightdb.utils.Schema;
 import ed.inf.adbs.lightdb.utils.Tuple;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
@@ -36,9 +37,9 @@ public class ProjectOperator extends Operator {
      *                 is a SelectExpressionItem. The Expression in a
      *                 SelectExpressionItem will always be a Column.
      */
-    public ProjectOperator(Operator operator, Select select) {
+    public ProjectOperator(Operator operator, PlainSelect plainSelect) {
         this.operator = operator;
-        this.selectItems = select.getPlainSelect().getSelectItems();
+        this.selectItems = plainSelect.getSelectItems();
     }
 
     /**

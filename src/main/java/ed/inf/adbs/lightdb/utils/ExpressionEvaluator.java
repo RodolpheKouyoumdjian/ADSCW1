@@ -13,6 +13,8 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
+import java.util.Map;
+import java.util.HashMap;
 
 public class ExpressionEvaluator extends ExpressionDeParser {
     private Tuple tuple;
@@ -62,8 +64,6 @@ public class ExpressionEvaluator extends ExpressionDeParser {
     public void visit(EqualsTo equalsTo) {
         Long left = handleOtherDataTypes(equalsTo.getLeftExpression());
         Long right = handleOtherDataTypes(equalsTo.getRightExpression());
-
-
         result = left.equals(right);
     }
 
@@ -128,6 +128,11 @@ public class ExpressionEvaluator extends ExpressionDeParser {
         result = left <= right;
     }
 
+    /**
+     * Handles other data types such as LongValue, Column, and Multiplication.
+     * @param expression
+     * @return The result of the evaluation.
+     */
     public Long handleOtherDataTypes(Expression expression) {
         if (expression instanceof BinaryExpression) {
             expression.accept(this);
@@ -138,8 +143,8 @@ public class ExpressionEvaluator extends ExpressionDeParser {
         }
 
         if (expression instanceof Column) {
-            Column column = (Column) expression;    
-        
+            Column column = (Column) expression;
+
             return this.tuple.getValueFromColumn(column);
         }
 
@@ -154,5 +159,48 @@ public class ExpressionEvaluator extends ExpressionDeParser {
 
     }
 
-    
+    /**
+     * Check if the WHERE clause is an invariant expression. 
+     * @param expression
+     * @return A map containing the result of the check. Will indicate both if the expression is invariant and if the expression is true or false.
+     */
+    public Map<String, Boolean> checkIfWhereIsInvariant(Expression expression) {
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("isInvariant", false);
+        result.put("value", null);
+
+        if (expression == null) {
+            result.put("isInvariant", true);
+            result.put("value", true);
+            return result;
+        }
+
+        if (expression instanceof BinaryExpression) {
+            BinaryExpression binaryExpression = (BinaryExpression) expression;
+            Expression leftExpression = binaryExpression.getLeftExpression();
+            Expression rightExpression = binaryExpression.getRightExpression();
+
+            if (leftExpression instanceof LongValue && rightExpression instanceof LongValue) {
+                // If both operands are LongValue, evaluate the expression
+                long left = ((LongValue) leftExpression).getValue();
+                long right = ((LongValue) rightExpression).getValue();
+                result.put("isInvariant", true);
+                if (binaryExpression instanceof EqualsTo) {
+                    result.put("value", left == right);
+                    ;
+                } else if (binaryExpression instanceof GreaterThan) {
+                    result.put("value", left > right);
+                } else if (binaryExpression instanceof GreaterThanEquals) {
+                    result.put("value", left >= right);
+                } else if (binaryExpression instanceof MinorThan) {
+                    result.put("value", left < right);
+                } else if (binaryExpression instanceof MinorThanEquals) {
+                    result.put("value", left <= right);
+                } else if (binaryExpression instanceof NotEqualsTo) {
+                    result.put("value", left != right);
+                }
+            }
+        }
+        return result;
+    }
 }
